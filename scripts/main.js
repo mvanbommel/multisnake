@@ -80,7 +80,7 @@ function draw() {
 
       if (!snake.appleConsumed) {
         /* Remove end of snake tail, which the snake has left */
-        /*snake.position.pop();*/
+        snake.position.pop();
       }
     }
 
