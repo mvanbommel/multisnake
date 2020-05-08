@@ -81,11 +81,13 @@ function draw() {
           }
         }
       }
+    }
 
-      if (!snake.appleConsumed) {
-        /* Remove end of snake tail, which the snake has left */
-        snake.position.pop();
-      }
+    /* Check if any apple is consumed */
+    let anyAppleConsumed = snakes.map(snake => snake.appleConsumed).some(x => x === true);
+    if (!anyAppleConsumed) {
+      /* Remove ends of snake tails, which the snakes have left */
+      snakes.forEach(snake => snake.position.pop());
     }
 
     for (let snakeIndex = 0; snakeIndex < snakes.length; snakeIndex ++) {
@@ -129,6 +131,8 @@ function draw() {
   apples.forEach(apple => {
     context.fillStyle = apple.color;
     context.fillRect(apple.x, apple.y, gridSize - 1, gridSize - 1);
+    context.fillStyle = "red";
+    context.fillRect(apple.x + 2, apple.y + 2, gridSize - 5, gridSize - 5);
   });
 
   keyPressResolved = true;
