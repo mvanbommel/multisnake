@@ -5,31 +5,35 @@ const refreshRate = 1000 / 10;
 setInterval(draw, refreshRate);
 
 $(document).keydown(function(event) {
-  const key = event.which
+  if (keyPressResolved) {
+    keyPressResolved = false;
 
-  if (!gameInProgress && [37, 38, 39, 40].includes(key)) {
-    gameInProgress = true;
-  }
+    const key = event.which
 
-  for (let snakeIndex = 0; snakeIndex < snakes.length; snakeIndex ++) {
-    let snake = snakes[snakeIndex];
-    /* Only switch direction if not already moving along that plane */
-    if (key === 37 && snake.xMove === 0) {
-      /* Left arrow */
-      snake.xMove = -1 * snake.xModifier;
-      snake.yMove = 0;
-    } else if (key === 38 && snake.yMove === 0) {
-      /* Up arrow */
-      snake.yMove = -1 * snake.yModifier;
-      snake.xMove = 0;
-    } else if (key === 39 && snake.xMove === 0) {
-      /* Right arrow */
-      snake.xMove = 1 * snake.xModifier;
-      snake.yMove = 0;
-    } else if (key === 40 && snake.yMove === 0) {
-      /* Down arrow */
-      snake.yMove = 1 * snake.yModifier;
-      snake.xMove = 0;
+    if (!gameInProgress && [37, 38, 39, 40].includes(key)) {
+      gameInProgress = true;
+    }
+
+    for (let snakeIndex = 0; snakeIndex < snakes.length; snakeIndex ++) {
+      let snake = snakes[snakeIndex];
+      /* Only switch direction if not already moving along that plane */
+      if (key === 37 && snake.xMove === 0) {
+        /* Left arrow */
+        snake.xMove = -1 * snake.xModifier;
+        snake.yMove = 0;
+      } else if (key === 38 && snake.yMove === 0) {
+        /* Up arrow */
+        snake.yMove = -1 * snake.yModifier;
+        snake.xMove = 0;
+      } else if (key === 39 && snake.xMove === 0) {
+        /* Right arrow */
+        snake.xMove = 1 * snake.xModifier;
+        snake.yMove = 0;
+      } else if (key === 40 && snake.yMove === 0) {
+        /* Down arrow */
+        snake.yMove = 1 * snake.yModifier;
+        snake.xMove = 0;
+      }
     }
   }
 });
@@ -127,6 +131,8 @@ function draw() {
     context.fillRect(apple.x, apple.y, gridSize - 1, gridSize - 1);
   });
 
+  keyPressResolved = true;
+
 }
 
 
@@ -172,6 +178,8 @@ let apple2 = new Apple("white");
 let apples = [apple1, apple2];
 
 let gameInProgress = false;
+
+let keyPressResolved = true;
 
 function drawSnake(gridPosition) {
   context.fillRect(gridPosition[0], gridPosition[1], gridSize - 1, gridSize - 1);
