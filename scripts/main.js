@@ -2,7 +2,7 @@ const canvas = $("#canvas");
 const context = canvas[0].getContext("2d");
 
 const refreshRate = 1000 / 10;
-setInterval(draw, refreshRate);
+let drawIntervalID = setInterval(draw, refreshRate);
 
 $(document).keydown(function(event) {
   if (keyPressResolved) {
@@ -49,6 +49,9 @@ function draw() {
     for (let snakeIndex = 0; snakeIndex < snakes.length; snakeIndex ++) {
       let snake = snakes[snakeIndex];
 
+      snake.lastX = snake.x;
+      snake.lastY = snake.y;
+
       snake.x += snake.xMove * gridSize;
       snake.y += snake.yMove * gridSize;
 
@@ -75,7 +78,13 @@ function draw() {
         if (snake.x === apple.x && snake.y === apple.y) {
           if (snake.color === apple.color) {
             snake.appleConsumed = true;
-            apples[i] = new Apple(apple.color);
+
+            let newAppleColor = "green";
+            if (apple.color === "green") {
+              newAppleColor = "white";
+            } 
+
+            apples[i] = new Apple(newAppleColor);
           } else {
             gameInProgress = false;
           }
@@ -90,7 +99,9 @@ function draw() {
       snakes.forEach(snake => snake.position.pop());
     }
 
+    /* Check for collisions */
     for (let snakeIndex = 0; snakeIndex < snakes.length; snakeIndex ++) {
+      /* debugger; */
       let snake = snakes[snakeIndex];
 
       for (let otherSnakeIndex = snakeIndex; otherSnakeIndex < snakes.length; otherSnakeIndex ++) {
@@ -98,25 +109,31 @@ function draw() {
         
         if (snakeIndex === otherSnakeIndex) {
           if (snake.length > 3) {
-            /* Snake will never collide with its 3 first positions */
+            /* Snake will never collide with its own 3 first positions */
             /* This prevents false collisions from rapid key strokes */
             snake.position.slice(3, snake.length).forEach(position => checkCollision(position, [snake.x, snake.y]));
           }
         } else {
           /* Check if any part of otherSnake collides with head of snake */
           otherSnake.position.forEach(position => checkCollision(position, [snake.x, snake.y]));
+
+          /* Check head on collisions separately in case the order of snake movements lets it be missed in first check */
+          /* Snakes move to same spot */
+          checkCollision([otherSnake.x, otherSnake.y], [snake.x, snake.y])
+          /* Snakes switch positions */
+          if (snake.x === otherSnake.lastX && snake.y === otherSnake.lastY && snake.lastX === otherSnake.x && snake.lastY === otherSnake.y) {
+            gameInProgress = false;
+          }
         }
       }
 
       /* Complete snake movement */
       snake.position.unshift([snake.x, snake.y]);
-    }
 
+    }
           
     if (!gameInProgress) {
       alert("Game Over!")
-      console.log(snakes);
-      console.log(apples);
     }
   }
 
@@ -150,6 +167,8 @@ class Snake {
     this.color = color;
     this.x = x;
     this.y = y;
+    this.lastX = x;
+    this.lastY = y;
     this.position = [[x, y]];
     this.xMove = 0;
     this.yMove = 0;
@@ -173,13 +192,15 @@ class Apple {
   }
 }
 
-let snake1 = new Snake("green", 100, 100);
-let snake2 = new Snake("white", 400, 400, -1, -1);
-let snakes = [snake1, snake2];
+/* Offset snake x and y values to avoid any apple spots that would force collision */
+let snake1 = new Snake("green", 120, 120);
+let snake2 = new Snake("white", 130, 380, -1, -1);
+let snake3 = new Snake("green", 380, 390);
+let snake4 = new Snake("white", 390, 130, -1, -1);
+let snakes = [snake1, snake2, snake3, snake4];
 
 let apple1 = new Apple("green");
-let apple2 = new Apple("white");
-let apples = [apple1, apple2];
+let apples = [apple1];
 
 let gameInProgress = false;
 
